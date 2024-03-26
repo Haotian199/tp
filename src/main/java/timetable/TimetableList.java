@@ -21,7 +21,7 @@ public class TimetableList {
         classCount = 0;
     }
 
-    public static void addClass(String schedule, Boolean userAdded) {
+    public static void addClass(String schedule, Boolean userAdded) { //need to create method to process command for timetable
         try {
             String[] parts = schedule.split("day/", 2);
             if (parts.length < 2) {
