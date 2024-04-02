@@ -3,24 +3,13 @@ package seedu.duke;
 import expenditure.ExpenditureList;
 import storage.Storage;
 import gpa.GPACommand;
-import gc.gc;
+import gc.GC;
+import timetable.TimetableList;
+import timetable.TimetableParser;
 
 public class ProcessCommand {
 
-    public ProcessCommand() {
-    }
-
     public void processUserCommand(String command) {
-        if(command.startsWith("gpa")){
-            GPACommand.processGPACommand();
-        }
-
-        if (!command.startsWith("e/")) {
-            System.out.println("Invalid command. Commands related to expenditures should start with 'e/'.");
-            System.out.println("Commands related to gpa calculation should start with 'gpa'.");
-            return;
-        }
-
         String[] commandParts = command.substring(2).trim().split("/", 2);
         if (commandParts.length < 2) {
             System.out.println("Incomplete command!");
@@ -49,19 +38,25 @@ public class ProcessCommand {
         }
     }
 
-    public boolean userCommand(String input, ExpenditureList expenses) {
+    public boolean userCommand(String input, ExpenditureList expenses, TimetableList timetable) {
         assert input != null;
-        input = input.trim().toLowerCase();
-        switch (input) {
+        String command;
+        int index = input.indexOf(" ");
+        if (index != -1) {
+            command = input.substring(0, index).trim().toLowerCase();
+        } else {
+            command = input.trim().toLowerCase();
+        }
+        switch (command) {
         case "gpa":
             GPACommand.processGPACommand();
             UI.printHelpMessage();
             break;
         case "gc":
-            gc.main();
+            GC.main();
             break;
         case "exit":
-            System.out.println("Shutting down... Goodbye!!");
+            UI.printExitMessage();
             Storage.writeToFile(expenses);
             return true;
         case "list":
@@ -73,10 +68,14 @@ public class ProcessCommand {
         case "help":
             UI.printHelpMessage();
             break;
+        case "tt/":
+            TimetableParser.parseTimetable(input);
+            break;
+        case "e/":
+            processUserCommand(input);
+            break;
         default:
-            if (input.startsWith("e/")) {
-                processUserCommand(input);
-            } else if (input.startsWith("view -m ")) {
+            if (input.startsWith("view -m ")) {
                 String monthYear = input.length() > "view -m ".length() ?
                         input.substring("view -m ".length()).trim() : "";
                 if (!monthYear.isEmpty()) {
@@ -92,6 +91,10 @@ public class ProcessCommand {
                 } else {
                     System.out.println("Please provide a year in YYYY format after 'view -y'.");
                 }
+            } else if (input.startsWith("view -t ")) {
+                index = input.indexOf("-t");
+                String type = input.substring(index + 2).toUpperCase().trim();
+                ExpenditureList.listExpensesByType(type);
             } else {
                 System.out.println("Unknown command. Please try again! Type 'help' for more information!");
             }

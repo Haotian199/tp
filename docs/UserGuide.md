@@ -5,11 +5,11 @@
 {Give a product intro}
 
 ## Quick Start
-
-{Give steps to get started quickly}
-
-1. Ensure that you have Java 11 or above installed.
-1. Down the latest version of `Duke` from [here](http://link.to/duke).
+1. Ensure you have `Java-11` or above installed on your computer.
+2. Download the latest version of `CantVas` from [here](https://github.com/AY2324S2-CS2113-W13-3/tp/releases).
+3. Copy the jar file to your desired folder.
+4. Open a command prompt in the same directory as the jar file.
+5. Run `java -jar CantVas.jar` to run the application.
 
 ## Features 
 

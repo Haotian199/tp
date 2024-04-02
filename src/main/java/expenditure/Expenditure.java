@@ -2,17 +2,25 @@ package expenditure;
 
 public class Expenditure {
     protected String description;
+
+    protected String type;
+
     protected Float amount;
     protected String date;
 
-    public Expenditure(String description, Float amount, String date) {
+    public Expenditure(String description, String type, Float amount, String date) {
         this.description = description;
+        this.type = type;
         this.amount = amount;
         this.date = date;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public Float getAmount() {
@@ -25,10 +33,10 @@ public class Expenditure {
 
     @Override
     public String toString() {
-        return description + " | Cost: $" + amount + " | date: " + date;
+        return description + " | " + type + " | Cost: $" + amount + " | date: " + date;
     }
 
     public String toStringStorage() {
-        return description + " | " + amount + " | " + date;
+        return description + " | " + type + " | " + amount + " | " + date;
     }
 }

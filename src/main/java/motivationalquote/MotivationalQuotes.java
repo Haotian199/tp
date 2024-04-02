@@ -1,4 +1,4 @@
-package motivationalquotes;
+package motivationalquote;
 import java.util.Random;
 
 public class MotivationalQuotes {

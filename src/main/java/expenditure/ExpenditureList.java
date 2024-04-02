@@ -9,18 +9,18 @@ import java.util.List;
 
 public class ExpenditureList {
     public static int expenditureCount;
-    private static ArrayList<Expenditure> expenditureList;
+    private static ArrayList<Expenditure> expenditureList = new ArrayList<>();
 
     public ExpenditureList() {
         expenditureList = new ArrayList<>();
         expenditureCount = 0;
     }
 
-    public static void listExpensesByMonth(String monthYear) {
+    public static List<Expenditure> listExpensesByMonth(String monthYear) {
         assert monthYear.length() == 7;
         if (!monthYear.matches("\\d{2}\\.\\d{4}")) {
             System.out.println("Month and year format incorrect! Please use MM.yyyy format.");
-            return;
+            return null;
         }
 
         String[] monthYearParts = monthYear.split("\\.");
@@ -38,23 +38,27 @@ public class ExpenditureList {
             }
         }
 
+        Float totalExpenses = 0.0F;
         if (filteredExpenses.isEmpty()) {
             System.out.println("No expenses found for " + monthYear);
         } else {
             System.out.println("Expenses for the month & year " + monthYear + ":");
             int count = 1;
             for (Expenditure exp : filteredExpenses) {
-                System.out.println(count + ". " + exp);
+                System.out.println(count++ + ". " + exp);
+                totalExpenses += exp.getAmount();
             }
+            System.out.println("Total expenses for " + monthYear + ": $" + totalExpenses);
         }
+        return filteredExpenses;
     }
 
-    public static void listExpensesByYear(String year) {
+    public static List<Expenditure> listExpensesByYear(String year) {
         List<Expenditure> filteredExpenses = new ArrayList<>();
 
         if (!year.matches("\\d{4}")) {
             System.out.println("Year format incorrect. Please use yyyy format.");
-            return;
+            return filteredExpenses;
         }
 
         for (Expenditure exp : expenditureList) {
@@ -66,15 +70,43 @@ public class ExpenditureList {
             }
         }
 
+        Float totalExpenses = 0.0F;
         if (filteredExpenses.isEmpty()) {
             System.out.println("No expenses found for year " + year);
         } else {
             System.out.println("Expenses for the year " + year + ":");
             int count = 1;
             for (Expenditure exp : filteredExpenses) {
-                System.out.println(count + ". " + exp);
+                System.out.println(count++ + ". " + exp);
+                totalExpenses += exp.getAmount();
+            }
+            System.out.println("Total expenses for " + year + ": $" + totalExpenses);
+        }
+
+        return filteredExpenses;
+    }
+
+    public static List<Expenditure> listExpensesByType(String type) {
+        List<Expenditure> filteredExpenses = new ArrayList<>();
+        for (Expenditure exp: expenditureList) {
+            String expensesType = exp.getType();
+            if (expensesType.equals(type)) {
+                filteredExpenses.add(exp);
             }
         }
+        Float totalExpenses = 0.0F;
+        if (filteredExpenses.isEmpty()) {
+            System.out.println("No expenses found for type: " + type);
+        } else {
+            System.out.println("Expenses for " + type);
+            int count = 1;
+            for (Expenditure exp: filteredExpenses) {
+                System.out.println(count++ + ". " + exp.toString());
+                totalExpenses += exp.getAmount();
+            }
+            System.out.println("Total expenses for " + type + ": $" + totalExpenses);
+        }
+        return filteredExpenses;
     }
 
 
@@ -87,11 +119,25 @@ public class ExpenditureList {
             // Description part directly after "d/"
             String descriptionPart = parts[1].trim();
 
+            parts = descriptionPart.split(" t/", 2);
+            String description = "";
+            String type = "";
+            if (parts.length < 2) {
+                type = "NA";
+            } else {
+                description = parts[0].trim();
+                descriptionPart = parts[1].trim();
+            }
+
             parts = descriptionPart.split(" amt/", 2);
             if (parts.length < 2) {
                 throw new InvalidInputFormatException("Invalid input format for amount.");
             }
-            String description = parts[0].trim();
+            if (type.isEmpty()) {
+                type = parts[0].trim().toUpperCase();
+            } else {
+                description = parts[0].trim();
+            }
             String amountAndDate = parts[1].trim();
 
             parts = amountAndDate.split(" date/", 2);
@@ -102,9 +148,9 @@ public class ExpenditureList {
             String date = parts[1].trim();
 
             float amountValue = Float.parseFloat(amount);
-            // Ensure that the expenditureList is initialized somewhere before thi
+
             if ( isValidDate(date) && isValidAmount(amountValue) ) {
-                expenditureList.add(new Expenditure(description, amountValue, date));
+                expenditureList.add(new Expenditure(description, type, amountValue, date));
                 expenditureCount += 1;
                 userAddedMessage(userAdded);
             }
@@ -126,6 +172,7 @@ public class ExpenditureList {
         assert index > 0 && index <= expenditureList.size() : "Index out of bounds.";
         Expenditure expenditure = expenditureList.get(index - 1);
         System.out.println("deleted: " + expenditure.getDescription() +
+                " | " + expenditure.getType() +
                 " | Cost: $" + expenditure.getAmount() +
                 " | date: " + expenditure.getDate());
         expenditureList.remove(index - 1);
@@ -151,22 +198,25 @@ public class ExpenditureList {
             System.out.println("No expenses to display.");
             return;
         }
-
+        Float totalExpenses = 0.0F;
         System.out.println("Current Expenses:");
         assert !expenditureList.isEmpty();
         for (int i = 0; i < expenditureList.size(); i++) {
             Expenditure expenditure = expenditureList.get(i);
             System.out.println((i + 1) + ". " + expenditure.getDescription() +
+                    " | " + expenditure.getType() +
                     " | Cost: $" + expenditure.getAmount() +
                     " | date: " + expenditure.getDate());
+            totalExpenses += expenditure.getAmount();
         }
+        System.out.println("Total expenses: $" + totalExpenses);
     }
 
     public Expenditure getExpenditure(int index) {
         return expenditureList.get(index);
     }
 
-    protected static boolean isValidDate(String date) {
+    public static boolean isValidDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         dateFormat.setLenient(false);
         try {
@@ -180,7 +230,7 @@ public class ExpenditureList {
         }
     }
 
-    protected static boolean isValidAmount(float amt) {
+    public static boolean isValidAmount(float amt) {
         if (amt >= 0) {
             String amtStr = String.valueOf(amt);
 
@@ -197,7 +247,5 @@ public class ExpenditureList {
         System.out.println("Please enter a positive amount");
         return false;
     }
-
-
 }
 

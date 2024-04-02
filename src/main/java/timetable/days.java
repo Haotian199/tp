@@ -2,29 +2,41 @@ package timetable;
 
 public class Days {
 
-    protected String classDescription;
-    protected String classTime;
-    protected String classDuration;
+    protected String classCode;
+    protected int classTime;
+    protected int classDuration;
     protected String classLocation;
 
-    public Days(String classDescription, String classTime, String classDuration, String classLocation){
-        this.classDescription = classDescription;
+    public Days(String classCode, int classTime, int classDuration, String classLocation) {
+        this.classCode = classCode;
         this.classTime = classTime;
         this.classDuration = classDuration;
         this.classLocation = classLocation;
     }
 
-    public String getClassDescription() {
-        return classDescription;
+    public String getClassCode() {
+        return classCode;
     }
 
-    public String getClassTime() {return classTime;}
+    public int getClassDuration() {
+        return classDuration;
+    }
 
-    public String getClassDuration() {return classDuration;}
+    public int getClassTime() {
+        return classTime;
+    }
 
     public String getClassLocation() {
         return classLocation;
     }
 
+    public String toStringStorage() {
+        return classCode + " | " + classDuration + " | " + classLocation;
+    }
 
+    @Override
+    public String toString() {
+        return "Code: " + classCode + ", Class Time: " + classTime + ", Duration: " + classDuration +
+                ", Location: " + classLocation;
+    }
 }
